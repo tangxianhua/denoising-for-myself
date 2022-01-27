@@ -20,7 +20,7 @@ np.save(r'D:\Project\Python\Data\Data\sources\jbilateral\moreSampleTest\DSC00017
 cv2.imwrite(r'D:\Project\Python\Data\Data\sources\jbilateral\moreSampleTest\DSC00017-guass-33250.tif',dst)
 #双边滤波
 # starttime = time.time()
-# dst = cv2.bilateralFilter(src=out, d=3, sigmaColor=800, sigmaSpace=500)
+dst = cv2.bilateralFilter(src=out, d=3, sigmaColor=800, sigmaSpace=500)
 # dst = dst.astype(np.uint16)
 # endtime = time.time()
 # print("time cost", starttime-endtime)

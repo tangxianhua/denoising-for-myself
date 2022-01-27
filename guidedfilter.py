@@ -3,16 +3,13 @@ import cv2
 import time
 import os
 def guideFilter(I, p, winSize, eps):
-
     mean_I = cv2.blur(I, winSize)      # I的均值平滑
     mean_p = cv2.blur(p, winSize)      # p的均值平滑
-
     mean_II = cv2.blur(I * I, winSize) # I*I的均值平滑
     mean_Ip = cv2.blur(I * p, winSize) # I*p的均值平滑
 
     var_I = mean_II - mean_I * mean_I  # 方差
     cov_Ip = mean_Ip - mean_I * mean_p # 协方差
-
     a = cov_Ip / (var_I + eps)         # 相关因子a
     b = mean_p - a * mean_I            # 相关因子b
 
@@ -20,6 +17,12 @@ def guideFilter(I, p, winSize, eps):
     mean_b = cv2.blur(b, winSize)      # 对b进行均值平滑
 
     q = mean_a * I + mean_b
+
+
+
+    print('q')
+    print(q[2,2])
+
     return q
 
 
@@ -77,65 +80,81 @@ if __name__ == '__main__':
     # np.save(r'D:\Project\Python\Data\Data\sources\jbilateral\moreSampleTest\30vs31vs32\30\guide-jbil\DSC00031-12-g2.npy',guideFilter_img)
     # guideFilter_img.tofile(r'D:\Project\Python\Data\Data\sources\jbilateral\moreSampleTest\30vs31vs32\30\guide-jbil\DSC00031-12-g2.raw')
 
-    epsr = 0.00001
+    epsr = 0.000007
     epsg = 0.00001
     epsb = 0.00001
     winSize = (3, 3)
     deno = 16383
-    path = r'D:\Project\Python\Data\Data\sources\jbilateral\moreSampleTest\sfr\samegain\sony6400\af\origin'
-    guideimagepath = r'D:\Project\Python\Data\Data\sources\jbilateral\moreSampleTest\sfr\samegain\sony6400\af\jgt\jbil'
-    savepath = r'D:\Project\Python\Data\Data\sources\jbilateral\moreSampleTest\sfr\samegain\sony6400\af\jgt\guide'
-    imagename = 'WB_out-'
-    guidename = 'WB_out-01-'
-    savename = 'jbilguide-01-'
+    path = r'D:\Project\Python\Data\Data\sources\jbilateral\moreSampleTest\sfr\origin'
+    guideimagepath = r'D:\Project\Python\Data\Data\sources\temp\2029\jbil'
+    savepath = r'D:\Project\Python\Data\Data\sources\temp\2029\guide'
+    imagename = 'DSC02029-'
+    guidename = 'c-float-'
+    savename = 'g01-'
 
 
     image = np.load(os.path.join(path,imagename+'r.npy'))
+    print('RRRRRRRRRRRRRRRRRRRRRRRRR')
+    #print(image[0:6,0:6])
     I = image / deno
     starttime = time.time()
     bilateral = np.load(os.path.join(guideimagepath,guidename+'r.npy'))
     bilateral = bilateral / deno
     guideFilter_img = guideFilter(I, bilateral, winSize, epsr)
     guideFilter_img = guideFilter_img * deno
+    #print(guideFilter_img[3,3])
     guideFilter_img[guideFilter_img > deno] = deno
     guideFilter_img = np.round(guideFilter_img)
+    #print(guideFilter_img[3, 3])
+    # print(guideFilter_img[0:6, 0:6])
+    # print('输出')
     endtime = time.time()
     print('cost time', endtime - starttime)
-    guideFilter_img = guideFilter_img.astype(np.uint16)
-    np.save(os.path.join(savepath,savename+'r.npy'),guideFilter_img)
-    guideFilter_img.tofile(os.path.join(savepath,savename+'r.raw'))
+    # guideFilter_img = guideFilter_img.astype(np.uint16)
+    # np.save(os.path.join(savepath,savename+'r.npy'),guideFilter_img)
+    # guideFilter_img.tofile(os.path.join(savepath,savename+'r.raw'))
 
     image = np.load(os.path.join(path,imagename+'b.npy'))
+    print('BBBBBBBBBBBBBBBBBBBBBBBBBBBBBB')
+    #print(image[0:6, 0:6])
     I = image / deno
     starttime = time.time()
     bilateral = np.load(os.path.join(guideimagepath,guidename+'b.npy'))
     bilateral = bilateral / deno
     guideFilter_img = guideFilter(I, bilateral, winSize, epsb)
     guideFilter_img = guideFilter_img * deno
+    #print(guideFilter_img[2,2])
     guideFilter_img[guideFilter_img > deno] = deno
     guideFilter_img = np.round(guideFilter_img)
+    #print(guideFilter_img[2, 2])
     endtime = time.time()
     print('cost time', endtime - starttime)
-    guideFilter_img = guideFilter_img.astype(np.uint16)
-    np.save(os.path.join(savepath,savename+'b.npy'),guideFilter_img)
-    guideFilter_img.tofile(os.path.join(savepath,savename+'b.raw'))
+    # guideFilter_img = guideFilter_img.astype(np.uint16)
+    # np.save(os.path.join(savepath,savename+'b.npy'),guideFilter_img)
+    # guideFilter_img.tofile(os.path.join(savepath,savename+'b.raw'))
 
     image = np.load(os.path.join(path,imagename+'g1.npy'))
+    print('G1G11G11111111111111111111111111111111')
+    #print(image[0:6, 0:6])
     I = image / deno
     starttime = time.time()
     bilateral = np.load(os.path.join(guideimagepath,guidename+'g1.npy'))
     bilateral = bilateral / deno
     guideFilter_img = guideFilter(I, bilateral, winSize, epsg)
     guideFilter_img = guideFilter_img * deno
+
     guideFilter_img[guideFilter_img > deno] = deno
     guideFilter_img = np.round(guideFilter_img)
+    #print(guideFilter_img[0:6, 0:6])
     endtime = time.time()
     print('cost time', endtime - starttime)
-    guideFilter_img = guideFilter_img.astype(np.uint16)
-    np.save(os.path.join(savepath,savename+'g1.npy'),guideFilter_img)
-    guideFilter_img.tofile(os.path.join(savepath,savename+'g1.raw'))
+    # guideFilter_img = guideFilter_img.astype(np.uint16)
+    # np.save(os.path.join(savepath,savename+'g1.npy'),guideFilter_img)
+    # guideFilter_img.tofile(os.path.join(savepath,savename+'g1.raw'))
 
     image = np.load(os.path.join(path,imagename+'g2.npy'))
+    print('G222222222222222222222222222222222222')
+    #print(image[0:6, 0:6])
     I = image / deno
     starttime = time.time()
     bilateral = np.load(os.path.join(guideimagepath,guidename+'g2.npy'))
@@ -144,8 +163,9 @@ if __name__ == '__main__':
     guideFilter_img = guideFilter_img * deno
     guideFilter_img[guideFilter_img > deno] = deno
     guideFilter_img = np.round(guideFilter_img)
+    #print(guideFilter_img[0:6, 0:6])
     endtime = time.time()
     print('cost time', endtime - starttime)
-    guideFilter_img = guideFilter_img.astype(np.uint16)
-    np.save(os.path.join(savepath,savename+'g2.npy'),guideFilter_img)
-    guideFilter_img.tofile(os.path.join(savepath,savename+'g2.raw'))
+    # guideFilter_img = guideFilter_img.astype(np.uint16)
+    # np.save(os.path.join(savepath,savename+'g2.npy'),guideFilter_img)
+    # guideFilter_img.tofile(os.path.join(savepath,savename+'g2.raw'))
